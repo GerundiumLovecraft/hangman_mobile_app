@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="words_array">
+        <item>ATMOSPHERE</item>
+        <item>BIOSPHERE</item>
+        <item>CELLULAR</item>
+        <item>DIFFUSION</item>
+        <item>ECOSYSTEM</item>
+        <item>FOSSIL</item>
+        <item>GEOLOGY</item>
+        <item>HABITAT</item>
+        <item>ISOTOPE</item>
+        <item>JUNGLE</item>
+        <item>KINETIC</item>
+        <item>LICHEN</item>
+        <item>MOLECULE</item>
+        <item>NEBULA</item>
+        <item>ORGANISM</item>
+        <item>PHOTON</item>
+        <item>QUANTUM</item>
+        <item>RADIANT</item>
+        <item>SPECIES</item>
+        <item>TECTONIC</item>
+        <item>UNIVERSE</item>
+        <item>VACUUM</item>
+        <item>WETLAND</item>
+        <item>XYLEM</item>
+        <item>YOSEMITE</item>
+        <item>ZOOLOGY</item>
+        <item>ASTEROID</item>
+        <item>BACTERIA</item>
+        <item>CLIMATE</item>
+        <item>DOPAMINE</item>
+        <item>EROSION</item>
+        <item>FUNGUS</item>
+        <item>GRAVITY</item>
+        <item>HORIZON</item>
+        <item>INERTIA</item>
+        <item>JUPITER</item>
+        <item>KRILL</item>
+        <item>MAGMA</item>
+        <item>NUCLEUS</item>
+        <item>OZONE</item>
+        <item>PHOTOSYNTHESIS</item>
+        <item>QUARTZ</item>
+        <item>REPTILE</item>
+        <item>SOLAR</item>
+        <item>TUNDRA</item>
+        <item>URANIUM</item>
+        <item>VOLCANO</item>
+        <item>WILDLIFE</item>
+        <item>XENON</item>
+        <item>YUCCA</item>
+    </string-array>
+</resources>

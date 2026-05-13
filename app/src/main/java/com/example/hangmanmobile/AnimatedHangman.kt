@@ -42,55 +42,64 @@ fun AnimatedHangman(modifier: Modifier = Modifier) {
         val w = size.width
         val h = size.height
 
-        val cyan = Color(0xFF00F5FF).copy(alpha = glowAlpha)
-        val pink = Color(0xFFFF2D78).copy(alpha = glowAlpha)
+        val cyan = Color(0xFF00F5FF)
+        val pink = Color(0xFFFF2D78)
         val gold = Color(0xFFF5C542)
-        val thick = 4f  // slightly thicker so it's more visible
 
-        // ── Gallows (scales with canvas size) ──
-        // Base
-        drawLine(cyan, Offset(w * 0.05f, h * 0.92f), Offset(w * 0.95f, h * 0.92f), thick)
-        // Pole
-        drawLine(cyan, Offset(w * 0.2f, h * 0.92f), Offset(w * 0.2f, h * 0.05f), thick)
-        // Top beam
-        drawLine(cyan, Offset(w * 0.2f, h * 0.05f), Offset(w * 0.65f, h * 0.05f), thick)
-        // Rope
-        drawLine(cyan, Offset(w * 0.65f, h * 0.05f), Offset(w * 0.65f, h * 0.18f), thick)
+        // glow + core helper functions
+        fun glowLine(color: Color, start: Offset, end: Offset) {
+            drawLine(color.copy(alpha = glowAlpha * 0.25f), start, end, strokeWidth = 14f)
+            drawLine(color.copy(alpha = glowAlpha), start, end, strokeWidth = 3f)
+        }
 
-        // ── Figure (all positions relative to canvas size) ──
-        val cx       = w * 0.65f   // center x — hangs from rope
-        val headY    = h * 0.27f   // head center y
-        val headR    = w * 0.1f    // head radius
+        fun glowCircle(color: Color, center: Offset, radius: Float) {
+            drawCircle(
+                color.copy(alpha = glowAlpha * 0.25f),
+                radius + 6f,
+                center,
+                style = Stroke(14f)
+            )
+            drawCircle(color.copy(alpha = glowAlpha), radius, center, style = Stroke(3f))
+        }
 
-        // Head
-        drawCircle(
-            color  = pink,
-            radius = headR,
-            center = Offset(cx, headY),
-            style  = Stroke(thick)
-        )
+        // figure measurements
+        val headR = w * 0.1f
+        val headY = h * 0.27f
+        val cx = w * 0.55f
 
-        // Body
-        val bodyTop    = Offset(cx, headY + headR)
+        // ── Gallows ──
+        glowLine(cyan, Offset(w * 0.08f, h * 0.92f), Offset(w * 0.75f, h * 0.92f)) // base
+        glowLine(cyan, Offset(w * 0.2f, h * 0.92f), Offset(w * 0.2f, h * 0.05f))   // pole
+        glowLine(cyan, Offset(w * 0.2f, h * 0.05f), Offset(w * 0.55f, h * 0.05f))  // beam
+        glowLine(cyan, Offset(w * 0.2f, h * 0.18f), Offset(w * 0.35f, h * 0.05f))  // strut
+        glowLine(
+            cyan,
+            Offset(cx, h * 0.05f),
+            Offset(cx, headY - headR)
+        )            // rope — ends exactly at head top
+
+        // ── Figure ──
+        glowCircle(pink, Offset(cx, headY), headR)  // head
+
+        val bodyTop = Offset(cx, headY + headR)
         val bodyBottom = Offset(cx, headY + headR + h * 0.22f)
-        drawLine(pink, bodyTop, bodyBottom, thick)
+        glowLine(pink, bodyTop, bodyBottom)  // body
 
-        // Arms
-        val armY     = Offset(cx, headY + headR + h * 0.07f)
-        val leftHand  = Offset(cx - w * 0.15f, headY + headR + h * 0.16f)
+        val armStart = Offset(cx, headY + headR + h * 0.07f)
+        val leftHand = Offset(cx - w * 0.15f, headY + headR + h * 0.16f)
         val rightHand = Offset(cx + w * 0.15f, headY + headR + h * 0.16f)
-        drawLine(pink, armY, leftHand, thick)
-        drawLine(pink, armY, rightHand, thick)
+        glowLine(pink, armStart, leftHand)   // left arm
+        glowLine(pink, armStart, rightHand)  // right arm
 
-        // Legs
-        val leftFoot  = Offset(cx - w * 0.13f, headY + headR + h * 0.37f)
+        val leftFoot = Offset(cx - w * 0.13f, headY + headR + h * 0.37f)
         val rightFoot = Offset(cx + w * 0.13f, headY + headR + h * 0.37f)
-        drawLine(pink, bodyBottom, leftFoot, thick)
-        drawLine(pink, bodyBottom, rightFoot, thick)
+        glowLine(pink, bodyBottom, leftFoot)   // left leg
+        glowLine(pink, bodyBottom, rightFoot)  // right leg
 
-        // ── Gold joint dots ──
-        listOf(leftHand, rightHand, leftFoot, rightFoot).forEach { point ->
-            drawCircle(gold, radius = 6f, center = point)
+        // ── Gold dots ──
+        listOf(leftHand, rightHand, leftFoot, rightFoot).forEach {
+            drawCircle(gold.copy(alpha = 0.3f), 10f, it)  // glow
+            drawCircle(gold, 5f, it)                       // core
         }
     }
 }

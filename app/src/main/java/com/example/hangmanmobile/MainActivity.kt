@@ -10,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,16 +17,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -71,6 +76,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun App(modifier: Modifier = Modifier) {
+    val gameViewModel: GameViewModel = viewModel()
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,18 +88,20 @@ fun App(modifier: Modifier = Modifier) {
 
         NavHost(navController = navController, startDestination = "home") {
             composable(route = "home") {
-                HomeScreen()
+                HomeScreen(onGameScreen = {
+                    navController.navigate("game")
+                })
             }
 
             composable(route = "game") {
-                GameScreen()
+                GameScreen(viewModel = gameViewModel)
             }
         }
     }
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(onGameScreen: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Column(
         verticalArrangement = Arrangement.Center,
@@ -104,7 +112,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            AnimatedHangman( modifier = Modifier.offset(x = 12.dp))
+            HomeScreenHangmanAnimation(modifier = Modifier.offset(x = 12.dp))
         }
         Spacer(modifier = modifier.height(12.dp))
         Text(
@@ -123,7 +131,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             color = CyanGlow.copy(alpha = 0.2f)
         )
         OutlinedButton(
-            onClick = {},
+            onClick = { onGameScreen() },
             border = BorderStroke(1.5.dp, CyanGlow),
             shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.outlinedButtonColors(
@@ -169,9 +177,40 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun GameScreen(modifier: Modifier = Modifier) {
-}
+fun GameScreen(viewModel: GameViewModel, modifier: Modifier = Modifier) {
+    LaunchedEffect(Unit) {
+        viewModel.startGame()
+    }
 
+    var failure by remember { mutableIntStateOf(0) }
+
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxSize()
+    ) {
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            GameScreenHangmanAnimation(
+                failureCount = failure
+            )
+        }
+
+        Button(
+            onClick = {
+                failure += 1
+            }
+        ) {
+            Text(
+                text = "Failure increase $failure"
+            )
+        }
+
+    }
+}
 
 @Preview(showBackground = true, showSystemUi = true, name = "Hangman")
 @Composable

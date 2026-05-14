@@ -1,4 +1,5 @@
 package com.example.hangmanmobile
+
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +22,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val wordLibrary = getApplication<Application>()
         .resources
         .getStringArray(R.array.words_array)
+
     // word handler to guess the word
     private lateinit var wordGuesser: WordGuesser
 
@@ -53,7 +55,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 endGame()
             }
         } else {
-            if (failures > 5) {
+            //Ends the game at the sixth failure
+            if (failures >= 5) {
+                failures = 6
                 endGame()
             } else {
                 failures++

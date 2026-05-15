@@ -41,6 +41,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.animation.core)
+    implementation(libs.androidx.compose.foundation.layout)
     val nav_version = "2.7.5"
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

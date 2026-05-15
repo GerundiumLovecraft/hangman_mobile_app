@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AnimatedHangman(modifier: Modifier = Modifier) {
+fun GameScreenHangmanAnimation(failureCount: Int, modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
 
     val glowAlpha by infiniteTransition.animateFloat(
@@ -67,39 +67,62 @@ fun AnimatedHangman(modifier: Modifier = Modifier) {
         val headY = h * 0.27f
         val cx = w * 0.55f
 
-        // ── Gallows ──
+        // ── Gallows ── Always visible
         glowLine(cyan, Offset(w * 0.08f, h * 0.92f), Offset(w * 0.75f, h * 0.92f)) // base
         glowLine(cyan, Offset(w * 0.2f, h * 0.92f), Offset(w * 0.2f, h * 0.05f))   // pole
         glowLine(cyan, Offset(w * 0.2f, h * 0.05f), Offset(w * 0.55f, h * 0.05f))  // beam
         glowLine(cyan, Offset(w * 0.2f, h * 0.18f), Offset(w * 0.35f, h * 0.05f))  // strut
-        glowLine(
-            cyan,
-            Offset(cx, h * 0.05f),
-            Offset(cx, headY - headR)
-        )            // rope — ends exactly at head top
+
+        // Rope mistake 1
+        if (failureCount >= 1) {
+            glowLine(
+                cyan,
+                Offset(cx, h * 0.05f),
+                Offset(cx, headY - headR)
+            )
+        }
 
         // ── Figure ──
-        glowCircle(pink, Offset(cx, headY), headR)  // head
+        // Head mistake 2
+        if (failureCount >= 2) {
+            glowCircle(pink, Offset(cx, headY), headR)  // head
+        }
+
 
         val bodyTop = Offset(cx, headY + headR)
         val bodyBottom = Offset(cx, headY + headR + h * 0.22f)
-        glowLine(pink, bodyTop, bodyBottom)  // body
+
+        // Body mistake 3
+        if (failureCount >= 3) {
+            glowLine(pink, bodyTop, bodyBottom)  // body
+        }
 
         val armStart = Offset(cx, headY + headR + h * 0.07f)
         val leftHand = Offset(cx - w * 0.15f, headY + headR + h * 0.16f)
         val rightHand = Offset(cx + w * 0.15f, headY + headR + h * 0.16f)
-        glowLine(pink, armStart, leftHand)   // left arm
-        glowLine(pink, armStart, rightHand)  // right arm
+
+        // Arms mistake 4
+        if (failureCount >= 4) {
+            glowLine(pink, armStart, leftHand)   // left arm
+            glowLine(pink, armStart, rightHand)  // right arm
+        }
 
         val leftFoot = Offset(cx - w * 0.13f, headY + headR + h * 0.37f)
         val rightFoot = Offset(cx + w * 0.13f, headY + headR + h * 0.37f)
-        glowLine(pink, bodyBottom, leftFoot)   // left leg
-        glowLine(pink, bodyBottom, rightFoot)  // right leg
+
+        // Legs mistake 5
+        if (failureCount >= 5) {
+            glowLine(pink, bodyBottom, leftFoot)   // left leg
+            glowLine(pink, bodyBottom, rightFoot)  // right leg
+        }
 
         // ── Gold dots ──
-        listOf(leftHand, rightHand, leftFoot, rightFoot).forEach {
-            drawCircle(gold.copy(alpha = 0.3f), 10f, it)  // glow
-            drawCircle(gold, 5f, it)                       // core
+        // Mistake 6
+        if (failureCount >= 6) {
+            listOf(leftHand, rightHand, leftFoot, rightFoot).forEach {
+                drawCircle(gold.copy(alpha = 0.3f), 10f, it)  // glow
+                drawCircle(gold, 5f, it)                       // core
+            }
         }
     }
 }

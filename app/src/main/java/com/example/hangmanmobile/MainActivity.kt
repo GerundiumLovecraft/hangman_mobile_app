@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,7 +77,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun App(modifier: Modifier = Modifier) {
-    val gameViewModel: GameViewModel = viewModel()
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,23 +85,40 @@ fun App(modifier: Modifier = Modifier) {
             .systemBarsPadding()
     ) {
         val navController = rememberNavController()
+        val gameView: GameViewModel = viewModel()
 
         NavHost(navController = navController, startDestination = "home") {
             composable(route = "home") {
-                HomeScreen(onGameScreen = {
-                    navController.navigate("game")
-                })
+                HomeScreen(
+                    gameView = gameView,
+                    onClickPlay = {navController.navigate("game")}
+                )
             }
 
             composable(route = "game") {
-                GameScreen(viewModel = gameViewModel)
+                GameScreen(
+                    gameView = gameView,
+                    endGame = {navController.navigate("endGame")}
+                )
+            }
+            composable(route="endGame") {
+                EndGameScreen(
+                    gameView = gameView,
+                    newGame = {navController.navigate("game")},
+                    backHome = {navController.navigate("home")},
+                    modifier = modifier
+                )
             }
         }
     }
 }
 
 @Composable
-fun HomeScreen(onGameScreen: () -> Unit, modifier: Modifier = Modifier) {
+fun HomeScreen(
+    gameView: GameViewModel,
+    onClickPlay: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     Column(
         verticalArrangement = Arrangement.Center,
@@ -131,7 +148,10 @@ fun HomeScreen(onGameScreen: () -> Unit, modifier: Modifier = Modifier) {
             color = CyanGlow.copy(alpha = 0.2f)
         )
         OutlinedButton(
-            onClick = { onGameScreen() },
+            onClick = {
+                gameView.startGame()
+                onClickPlay()
+                      },
             border = BorderStroke(1.5.dp, CyanGlow),
             shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.outlinedButtonColors(
@@ -177,40 +197,48 @@ fun HomeScreen(onGameScreen: () -> Unit, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun GameScreen(viewModel: GameViewModel, modifier: Modifier = Modifier) {
-    LaunchedEffect(Unit) {
-        viewModel.startGame()
-    }
-
-    var failure by remember { mutableIntStateOf(0) }
-
+fun GameScreen(
+    gameView: GameViewModel,
+    endGame: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
     ) {
-
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            GameScreenHangmanAnimation(
-                failureCount = failure
-            )
+//            GameScreenHangmanAnimation(
+//                failureCount = failure
+//            )
         }
+        MaskedWordContainer(
+            gameView.displayWord,
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+        VirtualKeyboard(
+            gameView.guessedLetters,
+            {char -> gameView.turn(char) },
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+    }
 
-        Button(
-            onClick = {
-                failure += 1
-            }
-        ) {
-            Text(
-                text = "Failure increase $failure"
-            )
+    // check if the game is won or lost
+    LaunchedEffect(gameView.gameWon, gameView.failures) {
+        if (gameView.gameWon || gameView.failures > 5) {
+            endGame()
         }
-
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true, name = "Hangman")
 @Composable

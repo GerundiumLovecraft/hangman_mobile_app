@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.hangmanmobile.ui.theme.CyanGlow
 
 @Composable
 fun MaskedWordContainer(
@@ -29,7 +30,8 @@ fun MaskedWordContainer(
             ) {
                 Text(
                     text = letter.toString(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = CyanGlow
                 )
             }
         }
